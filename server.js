@@ -1,16 +1,21 @@
 import express from "express";
+import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
+dotenv.config();
+
 const app = express();
-app.use(express.json());
+const port = process.env.PORT || 3000; // ✅ lowercase variable name
 
 // ES module directory setup
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Auto-load routes from /myroutes
+app.use(express.json());
+
+// Auto-load route files from /myroutes
 const routesPath = path.join(__dirname, "myroutes");
 fs.readdirSync(routesPath).forEach((file) => {
   if (file.endsWith(".js")) {
@@ -29,7 +34,7 @@ app.get("/", (req, res) => {
   res.send("Server is running!");
 });
 
-// ❌ Do NOT call app.listen() in Vercel Serverless
-
-// ✅ Export handler for Vercel
-export default app;
+// ✅ Start server correctly
+app.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${port}`);
+});
